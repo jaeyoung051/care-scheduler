@@ -1,0 +1,88 @@
+# Spring Boot 설정
+spring:
+  application:
+    name: home-care-backend
+  
+  # JPA 설정
+  jpa:
+    hibernate:
+      ddl-auto: validate  # validate, update, create, create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          time_zone: UTC
+    open-in-view: false
+  
+  # 데이터소스 설정
+  datasource:
+    url: jdbc:mysql://localhost:3306/home_care?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+  
+  # Jackson 설정 (JSON)
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+  
+  # Security 설정
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080
+
+# JWT 설정 (별도 properties 파일에서 관리하는 것이 좋음)
+jwt:
+  secret: "your-very-long-secret-key-should-be-at-least-32-characters-long-for-hs256-algorithm"
+  expiration: 86400000  # 24시간 (밀리초)
+  refresh-expiration: 604800000  # 7일
+
+# 로깅 설정
+logging:
+  level:
+    root: INFO
+    com.homecare: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d %p %c{1.} [%t] %m%n"
+  file:
+    name: logs/home-care.log
+    max-size: 10MB
+    max-history: 30
+
+# Server 설정
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# Actuator (모니터링)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# Swagger/Springdoc 설정
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
