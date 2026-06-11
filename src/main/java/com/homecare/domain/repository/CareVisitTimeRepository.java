@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * CareVisitTime Entity의 데이터 접근 계층
@@ -17,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface CareVisitTimeRepository extends JpaRepository<CareVisitTime, Long> {
     List<CareVisitTime> findByElderId(Long elderId);
-    Optional<CareVisitTime> findByElderIdAndDayOfWeek(Long elderId, DayOfWeek dayOfWeek);
+    List<CareVisitTime> findByElderIdAndDayOfWeek(Long elderId, DayOfWeek dayOfWeek);
     
     /**
      * 특정 어르신의 특정 요일 방문요양 시간과 겹치는 시간대 조회

@@ -9,7 +9,6 @@ import com.homecare.domain.repository.BathScheduleRepository;
 import com.homecare.domain.repository.ElderRepository;
 import com.homecare.domain.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +26,6 @@ public class BathScheduleService {
     private final ElderRepository elderRepository;
     private final VehicleRepository vehicleRepository;
     private final ScheduleValidationService validationService;
-    private final ModelMapper modelMapper;
 
     @Transactional
     public BathScheduleResponse createSchedule(CreateBathScheduleRequest request) {
@@ -94,7 +92,7 @@ public class BathScheduleService {
     }
 
     @Transactional
-    public BathScheduleResponse updateSchedule(Long id, CreateBathScheduleRequest request) {
+    public BathScheduleResponse updateSchedule(Long id, CreateBathScheduleRequest request) { // TODO : update 시 자기 자신 일정 제외 검증 필요
         BathSchedule schedule = bathScheduleRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("일정을 찾을 수 없습니다"));
 

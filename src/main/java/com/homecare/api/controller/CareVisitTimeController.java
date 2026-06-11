@@ -17,37 +17,47 @@ import java.util.List;
 @RequestMapping("/api/care-visits")
 @RequiredArgsConstructor
 public class CareVisitTimeController {
+
     private final CareVisitTimeService careVisitTimeService;
 
     @GetMapping("/{elderId}")
-    public ResponseEntity<List<CareVisitTimeResponse>> getCareVisitTimes(@PathVariable Long elderId) {
+    public ResponseEntity<List<CareVisitTimeResponse>> getCareVisitTimesByElder(
+            @PathVariable Long elderId
+    ) {
         return ResponseEntity.ok(careVisitTimeService.getCareVisitTimesByElder(elderId));
     }
 
     @GetMapping("/{elderId}/{dayOfWeek}")
-    public ResponseEntity<CareVisitTimeResponse> getCareVisitTime(
-        @PathVariable Long elderId,
-        @PathVariable DayOfWeek dayOfWeek) {
-        return ResponseEntity.ok(careVisitTimeService.getCareVisitTime(elderId, dayOfWeek));
+    public ResponseEntity<List<CareVisitTimeResponse>> getCareVisitTimes(
+            @PathVariable Long elderId,
+            @PathVariable DayOfWeek dayOfWeek
+    ) {
+        return ResponseEntity.ok(careVisitTimeService.getCareVisitTimes(elderId, dayOfWeek));
     }
 
     @PostMapping
-    public ResponseEntity<CareVisitTimeResponse> createCareVisitTime(@RequestBody CreateCareVisitTimeRequest request) {
+    public ResponseEntity<CareVisitTimeResponse> createCareVisitTime(
+            @RequestBody CreateCareVisitTimeRequest request
+    ) {
         return ResponseEntity.ok(careVisitTimeService.createCareVisitTime(request));
     }
 
     @PutMapping("/{elderId}/{dayOfWeek}")
-    public ResponseEntity<CareVisitTimeResponse> updateCareVisitTime(
-        @PathVariable Long elderId,
-        @PathVariable DayOfWeek dayOfWeek,
-        @RequestBody CreateCareVisitTimeRequest request) {
-        return ResponseEntity.ok(careVisitTimeService.updateCareVisitTime(elderId, dayOfWeek, request));
+    public ResponseEntity<List<CareVisitTimeResponse>> updateCareVisitTime(
+            @PathVariable Long elderId,
+            @PathVariable DayOfWeek dayOfWeek,
+            @RequestBody CreateCareVisitTimeRequest request
+    ) {
+        return ResponseEntity.ok(
+                careVisitTimeService.updateCareVisitTime(elderId, dayOfWeek, request)
+        );
     }
 
     @DeleteMapping("/{elderId}/{dayOfWeek}")
     public ResponseEntity<Void> deleteCareVisitTime(
-        @PathVariable Long elderId,
-        @PathVariable DayOfWeek dayOfWeek) {
+            @PathVariable Long elderId,
+            @PathVariable DayOfWeek dayOfWeek
+    ) {
         careVisitTimeService.deleteCareVisitTime(elderId, dayOfWeek);
         return ResponseEntity.noContent().build();
     }

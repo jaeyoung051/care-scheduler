@@ -36,7 +36,6 @@ public class ScheduleValidationService {
     private final VehicleRepository vehicleRepository;
 
     private static final int MIN_BATH_DURATION = 60; // 최소 목욕 시간 (분)
-    private static final int MAX_BATH_DURATION = 90; // 최대 목욕 시간 (분) - 경고 기준
 
     /**
      * 목욕 일정 전체 검증
@@ -50,9 +49,9 @@ public class ScheduleValidationService {
         }
 
         // Rule 2: 목욕 시간 검사
-        String durationWarning = validateBathDuration(startTime, endTime);
-        if (durationWarning != null) {
-            result.addWarning("Rule2", durationWarning);
+        String durationError = validateBathDuration(startTime, endTime);
+        if (durationError != null) {
+            result.addError("Rule2", durationError);
         }
 
         // Rule 3: 방문요양 시간 겹침 검사
@@ -83,18 +82,14 @@ public class ScheduleValidationService {
      * @return 문제가 없으면 null, 경고 메시지가 있으면 문자열 반환
      */
     public String validateBathDuration(LocalTime startTime, LocalTime endTime) {
-        long durationMinutes = java.time.temporal.ChronoUnit.MINUTES.between(startTime, endTime);
-        
-        if (durationMinutes < MIN_BATH_DURATION) {
-            return String.format("목욕 시간이 %d분 미만입니다 (최소 %d분 필요)", durationMinutes, MIN_BATH_DURATION);
-        }
-        
-        if (durationMinutes > MAX_BATH_DURATION) {
-            return String.format("목욕 시간이 %d분으로 표준(%d~65분)을 초과합니다", durationMinutes, MIN_BATH_DURATION);
-        }
-        
-        return null;
+    long durationMinutes = java.time.temporal.ChronoUnit.MINUTES.between(startTime, endTime);
+
+    if (durationMinutes < MIN_BATH_DURATION) {
+        return "목욕 시간은 최소 60분이어야 합니다";
     }
+
+    return null;
+}
 
     /**
      * Rule 3: 해당 어르신의 방문요양 시간과 겹침 확인

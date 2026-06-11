@@ -7,7 +7,6 @@ import com.homecare.domain.entity.Elder;
 import com.homecare.domain.repository.CareVisitTimeRepository;
 import com.homecare.domain.repository.ElderRepository;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 public class CareVisitTimeService {
     private final CareVisitTimeRepository careVisitTimeRepository;
     private final ElderRepository elderRepository;
-    private final ModelMapper modelMapper;
 
     @Transactional
     public CareVisitTimeResponse createCareVisitTime(CreateCareVisitTimeRequest request) {
@@ -49,30 +47,49 @@ public class CareVisitTimeService {
             .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
-    public CareVisitTimeResponse getCareVisitTime(Long elderId, DayOfWeek dayOfWeek) {
-        CareVisitTime careVisitTime = careVisitTimeRepository.findByElderIdAndDayOfWeek(elderId, dayOfWeek)
-            .orElseThrow(() -> new RuntimeException("방문요양 시간을 찾을 수 없습니다"));
-        return toResponse(careVisitTime);
+    
+@Transactional(readOnly = true)
+public List<CareVisitTimeResponse> getCareVisitTimes(Long elderId, DayOfWeek dayOfWeek) {
+    List<CareVisitTime> careVisitTimes =
+            careVisitTimeRepository.findByElderIdAndDayOfWeek(elderId, dayOfWeek);
+
+    return careVisitTimes.stream()
+            .map(this::toResponse)
+            .toList();
+}
+
+@Transactional
+public List<CareVisitTimeResponse> updateCareVisitTime(
+        Long elderId,
+        DayOfWeek dayOfWeek,
+        CreateCareVisitTimeRequest request
+) {
+    List<CareVisitTime> careVisitTimes =
+            careVisitTimeRepository.findByElderIdAndDayOfWeek(elderId, dayOfWeek);
+
+    if (careVisitTimes.isEmpty()) {
+        throw new RuntimeException("방문요양 시간을 찾을 수 없습니다");
     }
 
-    @Transactional
-    public CareVisitTimeResponse updateCareVisitTime(Long elderId, DayOfWeek dayOfWeek, CreateCareVisitTimeRequest request) {
-        CareVisitTime careVisitTime = careVisitTimeRepository.findByElderIdAndDayOfWeek(elderId, dayOfWeek)
-            .orElseThrow(() -> new RuntimeException("방문요양 시간을 찾을 수 없습니다"));
-
+    for (CareVisitTime careVisitTime : careVisitTimes) {
         careVisitTime.setStartTime(request.getStartTime());
         careVisitTime.setEndTime(request.getEndTime());
         careVisitTime.setMemo(request.getMemo());
-
-        CareVisitTime updated = careVisitTimeRepository.save(careVisitTime);
-        return toResponse(updated);
     }
 
-    @Transactional
-    public void deleteCareVisitTime(Long elderId, DayOfWeek dayOfWeek) {
-        careVisitTimeRepository.deleteByElderIdAndDayOfWeek(elderId, dayOfWeek);
-    }
+    List<CareVisitTime> updated = careVisitTimeRepository.saveAll(careVisitTimes);
+
+    return updated.stream()
+            .map(this::toResponse)
+            .toList();
+}
+
+@Transactional
+public void deleteCareVisitTime(Long elderId, DayOfWeek dayOfWeek) {
+    careVisitTimeRepository.deleteByElderIdAndDayOfWeek(elderId, dayOfWeek);
+}
+
+
 
     private CareVisitTimeResponse toResponse(CareVisitTime careVisitTime) {
         return CareVisitTimeResponse.builder()
