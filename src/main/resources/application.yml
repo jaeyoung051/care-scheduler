@@ -56,8 +56,6 @@ logging:
 # Server 설정
 server:
   port: 8080
-  servlet:
-    context-path: /api
 
 # Actuator (모니터링)
 management:
